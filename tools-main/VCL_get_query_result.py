@@ -1,5 +1,7 @@
-import requests
 import json
+
+import requests
+
 
 def get_query_result(query_id, api_key, records_per_page, page_number):
     """
@@ -23,7 +25,7 @@ def get_query_result(query_id, api_key, records_per_page, page_number):
     return response.json()
 
 # Example usage
-api_key = "insert-your-key"
+api_key = "a94iWCzg6W5Aq1J8COyDJd8xa9WB5Ja5"
 query_id = "0f9de2dd-ebb1-4218-bf74-7166215e8225"
 records_per_page = 500
 page_number = 1
