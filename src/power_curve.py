@@ -16,10 +16,23 @@ RATED_WIND_SPEED = 13.0
 CUT_OUT_WIND_SPEED = 31.0
 
 
-def get_power_at_wind_velocity(wind_velocity: float) -> float:
-    """Get wind turbine power output at a given wind velocity."""
+# def get_power_at_wind_velocity(wind_velocity: float) -> float:
+#     """Get wind turbine power output at a given wind velocity."""
 
-    return COEFFICIENT_OF_PERFORMANCE * 0.5 * AIR_DENSITY * AREA * wind_velocity**3
+#     return COEFFICIENT_OF_PERFORMANCE * 0.5 * AIR_DENSITY * AREA * wind_velocity**3
+
+
+def get_power_at_wind_velocity(wind_velocity: float) -> float:
+    if wind_velocity < CUT_IN_WIND_SPEED:
+        power = 0.0
+    elif CUT_IN_WIND_SPEED <= wind_velocity <= RATED_WIND_SPEED:
+        power = COEFFICIENT_OF_PERFORMANCE * 0.5 * AIR_DENSITY * AREA * wind_velocity**3
+    elif RATED_WIND_SPEED < wind_velocity <= CUT_OUT_WIND_SPEED:
+        power = COEFFICIENT_OF_PERFORMANCE * 0.5 * AIR_DENSITY * AREA * RATED_WIND_SPEED**3
+    else:
+        power = 0.0
+
+    return power
 
 
 def get_power_curve(wind_velocities: Sequence[float]) -> Sequence[float]:
