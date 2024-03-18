@@ -1,0 +1,15 @@
+{
+    "version": "2.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "purpose": ["debug-test"],
+            "console": "integratedTerminal",
+            "env": {"PYTEST_ADDOPTS": "--no-cov --capture=no -vv"},
+            "justMyCode": false
+        }
+    ]
+}
