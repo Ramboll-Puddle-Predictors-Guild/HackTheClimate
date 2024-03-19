@@ -3,59 +3,62 @@ import numpy as np
 import pandas as pd
 import polars as pl
 from scipy.interpolate import interp1d
+
 from turbine_definition import TURBINES
 
+# turbine = TURBINES["IEA 3.4 130"]
+# windfarm = "e2"
+# slider = 150
 
 def calculate_impingement(turbine, windfarm, slider):
-    windfarm_files = {
-        'e2': 'Climate_Data/latvia_edata.csv',
-        'nordsen iii vest': 'Climate_Data/denmark_edata.csv'
-    }
+    windfarm_files = {"e2": "Climate_Data/latvia_edata.csv", "nordsen iii vest": "Climate_Data/denmark_edata.csv"}
     # # Check if the selected country is in the dictionary
 
     if windfarm in windfarm_files:
         # Read the corresponding CSV file
         impingement_raw = pd.read_csv(windfarm_files[windfarm], sep=",", decimal=".")
     else:
-        print('Invalid country selected.')
+        print("Invalid country selected.")
 
     # Parameters
-    n_max = turbine['n_max']  # Rpm
-    radius = turbine['radius']  # m
+    n_max = turbine["n_max"]  # Rpm
+    radius = turbine["radius"]  # m
     # Load the CSV file for the specified windfarm
     impingement_raw = pd.read_csv(windfarm_files[windfarm], sep=",", decimal=".")
     impingement_raw["timestamp"] = pd.to_datetime(impingement_raw["timestamp"])
 
     # Interpolate n.star
-    impingement_raw["n_star"] = interp1d(turbine["power_curve"]["wind_speed"], turbine["power_curve"]["rotor_speed"], fill_value="extrapolate")(impingement_raw['wsp_150.0'])
+    impingement_raw["n_star"] = interp1d(
+        turbine["power_curve"]["wind_speed"], turbine["power_curve"]["rotor_speed"], fill_value="extrapolate"
+    )(impingement_raw["wsp_150.0"])
 
     # Calculate omega
     impingement_raw["omega"] = (((2 * np.pi) / 60)) * impingement_raw["n_star"]
 
-    #calculate omega capped
-    omega_max = slider* 30 /np.pi
+    # calculate omega capped
+    omega_max = slider / turbine["radius"]
     # Create the 'omega_capped' column
     impingement_raw["omega_capped"] = np.where(
-        (impingement_raw["qrain_150.0"] > 0.01) & (impingement_raw["omega"] > omega_max),
+        (impingement_raw["qrain_150.0"] > 0) & (impingement_raw["omega"] > omega_max),
         omega_max,
-        impingement_raw["omega"]
+        impingement_raw["omega"],
     )
 
     # Calculate v.max
     impingement_raw["v_max"] = np.sqrt(impingement_raw["wsp_150.0"] ** 2 + (impingement_raw["omega_capped"] * radius) ** 2)
 
     # Calculate r.impg
-    impingement_raw["r_impg"] = (impingement_raw["qrain_150.0"] * impingement_raw["v_max"] * 3600 * (1.225 / 1000))
+    impingement_raw["r_impg"] = impingement_raw["qrain_150.0"] * impingement_raw["v_max"] * 3600 * (1.225 / 1000)
 
     # Accumulate r.impg
     impingement_raw["r_impg_acc_sum"] = impingement_raw["r_impg"].cumsum()
 
     # First Plot
-    plt.figure(figsize=(10, 6))
-    plt.scatter(impingement_raw["timestamp"], impingement_raw["r_impg_acc_sum"])
-    plt.xlabel("Timestamp")
-    plt.ylabel("Accumulated Impingement [m]")
-    plt.title("Accumulated Impingement Over Time")
+    # plt.figure(figsize=(10, 6))
+    # plt.scatter(impingement_raw["timestamp"], impingement_raw["r_impg_acc_sum"])
+    # plt.xlabel("Timestamp")
+    # plt.ylabel("Accumulated Impingement [m]")
+    # plt.title("Accumulated Impingement Over Time")
     # plt.show()
 
     # Load impingement test data and sort
@@ -71,7 +74,6 @@ def calculate_impingement(turbine, windfarm, slider):
     r_acc_limit = interp1d(curve[:, 1], curve[:, 0])(rotor_speed)
 
     plt.figure(figsize=(10, 6))
-    # plt.semilogx(curve[:, 0], curve[:, 1], color="blue", label="3L")
     plt.semilogx(
         impingement_testdata["3L_X"],
         impingement_testdata["3L_Y"],
@@ -105,7 +107,6 @@ def calculate_impingement(turbine, windfarm, slider):
     plt.axvline(impingement_raw["r_impg_acc_sum"].to_numpy()[-1])
     plt.legend()
 
-
     plt.xlabel("Racc")
     plt.ylabel("rot speed")
     # plt.show()
@@ -115,12 +116,13 @@ def calculate_impingement(turbine, windfarm, slider):
     lossvector = (1 - impingement_raw["r_impg_acc_sum"] / r_acc_limit * power_loss) * 100
 
     # Plot turbine efficiency over time
-    plt.figure(figsize=(10, 6))
-    plt.plot(impingement_raw["timestamp"], lossvector)
-    plt.xlabel("Timestamp")
-    plt.ylabel("Turbine Efficiency [%]")
-    plt.title("Turbine Efficiency Over Time")
-    plt.show()
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(impingement_raw["timestamp"], lossvector)
+    # plt.xlabel("Timestamp")
+    # plt.ylabel("Turbine Efficiency [%]")
+    # plt.title("Turbine Efficiency Over Time")
+    # plt.show()
 
     return impingement_raw, impingement_testdata, r_acc_limit, lossvector
 
+calculate_impingement(TURBINES["IEA 3.4 130"], "e2", 0.02)
