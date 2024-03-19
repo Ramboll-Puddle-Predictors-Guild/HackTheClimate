@@ -1,5 +1,6 @@
 """Module for computing power output."""
 
+import csv
 from typing import Sequence
 
 import matplotlib.pyplot as plt
@@ -20,6 +21,19 @@ CUT_OUT_WIND_SPEED = 31.0
 #     """Get wind turbine power output at a given wind velocity."""
 
 #     return COEFFICIENT_OF_PERFORMANCE * 0.5 * AIR_DENSITY * AREA * wind_velocity**3
+
+
+def read_power_curve(path: str) -> dict[str, Sequence[float]]:
+    curve = {
+        "wind_speed": [],
+        "power": [],
+    }
+    with open(path) as buffer:
+        reader = csv.DictReader(buffer, lineterminator="\n")
+        for record in reader:
+            curve["wind_speed"].append(float(record["wind_speed"]))
+            curve["power"].append(float(record["power"]) * 1e-3)
+    return curve
 
 
 def get_power_at_wind_velocity(wind_velocity: float) -> float:
