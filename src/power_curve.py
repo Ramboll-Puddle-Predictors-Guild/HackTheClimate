@@ -21,3 +21,9 @@ def read_power_curve(path: str) -> dict[str, Sequence[float]]:
             curve["power"].append(float(record["power"]) * 1e-3)
             curve["rotor_speed"].append(float(record["rotor_speed"]))
     return curve
+
+
+def get_power_at_wind_velocity(wind_speed: float, curve: dict[str, Sequence[float]]) -> float:
+    """Get the power output at a given wind speed."""
+    # TODO: Something here that returns the power (MW) at the given wind speed.
+    raise NotImplementedError()
