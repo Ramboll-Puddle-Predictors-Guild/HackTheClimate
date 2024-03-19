@@ -5,7 +5,7 @@ import polars as pl
 from scipy.interpolate import interp1d
 
 # Define a dictionary mapping country names to CSV file paths
-country_files = {
+windfarm_files = {
     'e2': 'Climate_Data/latvia_edata.csv',
     'nordsen iii vest': 'Climate_Data/denmark_edata.csv'
 }
@@ -19,12 +19,12 @@ radius = 120  # m
 
 
 # Ask the user to select a country
-country = input('Please select a wind farm: ').lower()
+windfarm = input('Please select a wind farm: ').lower()
 
 # Check if the selected country is in the dictionary
-if country in country_files:
+if windfarm in windfarm_files:
     # Read the corresponding CSV file
-    impingement_raw = pd.read_csv(country_files[country], sep=",", decimal=".")
+    impingement_raw = pd.read_csv(windfarm_files[windfarm], sep=",", decimal=".")
 else:
     print('Invalid country selected.')
 
@@ -32,7 +32,7 @@ else:
 
 # Convert timestamp from string to datetime
 impingement_raw["timestamp"] = pd.to_datetime(
-    impingement_raw["timestamp"], dayfirst=True
+    impingement_raw["timestamp"]
 )
 
 
