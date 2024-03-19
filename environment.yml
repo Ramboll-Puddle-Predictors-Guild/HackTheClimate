@@ -9,7 +9,7 @@ dependencies:
 - folium
 - black
 - black-jupyter
-- requestst
+- requests
 - ipywidgets
 - bokeh
 
