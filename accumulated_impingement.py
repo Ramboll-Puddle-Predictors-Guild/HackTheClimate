@@ -4,6 +4,12 @@ import pandas as pd
 import polars as pl
 from scipy.interpolate import interp1d
 
+# Define a dictionary mapping country names to CSV file paths
+country_files = {
+    'e2': 'Climate_Data/latvia_edata.csv',
+    'nordsen iii vest': 'Climate_Data/denmark_edata.csv'
+}
+
 # Parameters
 n_min = 5  # Rpm
 n_max = 7.56  # Rpm
@@ -12,13 +18,20 @@ v_min = 7  # m/s
 radius = 120  # m
 
 
-# # Read the CSV file
-impingement_raw = pd.read_csv("Climate_Data/impingement_dat.csv", sep=";", decimal=",")
+# Ask the user to select a country
+country = input('Please select a wind farm: ').lower()
+
+# Check if the selected country is in the dictionary
+if country in country_files:
+    # Read the corresponding CSV file
+    impingement_raw = pd.read_csv(country_files[country], sep=",", decimal=".")
+else:
+    print('Invalid country selected.')
 
 # TODO: calculate impingement here
 
 # Convert timestamp from string to datetime
-impingement_raw['timestamp'] = pd.to_datetime(impingement_raw['timestamp'], dayfirst=True)
+impingement_raw['timestamp'] = pd.to_datetime(impingement_raw['timestamp'])
 
 
 # Calculate n.star
