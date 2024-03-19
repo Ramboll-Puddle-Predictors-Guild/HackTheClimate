@@ -28,7 +28,9 @@ def get_power_at_wind_velocity(wind_velocity: float) -> float:
     elif CUT_IN_WIND_SPEED <= wind_velocity <= RATED_WIND_SPEED:
         power = COEFFICIENT_OF_PERFORMANCE * 0.5 * AIR_DENSITY * AREA * wind_velocity**3
     elif RATED_WIND_SPEED < wind_velocity <= CUT_OUT_WIND_SPEED:
-        power = COEFFICIENT_OF_PERFORMANCE * 0.5 * AIR_DENSITY * AREA * RATED_WIND_SPEED**3
+        power = (
+            COEFFICIENT_OF_PERFORMANCE * 0.5 * AIR_DENSITY * AREA * RATED_WIND_SPEED**3
+        )
     else:
         power = 0.0
 
