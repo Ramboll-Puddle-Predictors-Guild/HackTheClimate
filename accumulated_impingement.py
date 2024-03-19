@@ -1,9 +1,8 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-
-# # Read the CSV file
-impingement_raw = pd.read_csv("Climate_Data/impingement_dat.csv", sep=';', decimal=',')
+import numpy as np
+import pandas as pd
+import polars as pl
+from scipy.interpolate import interp1d
 
 # Parameters
 n_min = 5  # Rpm
@@ -11,6 +10,12 @@ n_max = 7.56  # Rpm
 v_rated = 10.66  # m/s
 v_min = 7  # m/s
 radius = 120  # m
+
+
+# # Read the CSV file
+impingement_raw = pd.read_csv("Climate_Data/impingement_dat.csv", sep=";", decimal=",")
+
+# TODO: calculate impingement here
 
 # Convert timestamp from string to datetime
 impingement_raw['timestamp'] = pd.to_datetime(impingement_raw['timestamp'], dayfirst=True)
@@ -40,5 +45,60 @@ impingement_raw['r_impg_acc_sum'] = impingement_raw['r_impg'].cumsum()
 plt.figure(figsize=(10, 6))
 plt.scatter(impingement_raw['timestamp'], impingement_raw['r_impg_acc_sum'])
 plt.xlabel('Timestamp')
-plt.ylabel('r_impg_acc_sum')
+plt.ylabel("accumulated impingement [m]")
+plt.show()
+
+# lookup accumulated impingement at which the coating fails (from wpd dataset)
+
+impingement_testdata = pd.read_csv("data/wpd_datasets_clean.csv", sep=",", decimal=".", header=0)
+p = pl.read_csv("data/wpd_datasets_clean.csv").sort(by="3L_X")
+
+coating = "GS"
+curve = p.select([f"{coating}_X", f"{coating}_Y"]).drop_nulls().to_numpy()
+
+rotor_speed = n_max * np.pi / 30 * radius
+
+# find location on plot
+r_acc_limit = interp1d(curve[:, 1], curve[:, 0])(rotor_speed)
+
+
+print(r_acc_limit)
+
+
+# impingement_testdata = impingement_testdata.dropna()
+
+
+# df = impingement_testdata
+
+plt.figure(figsize=(10, 6))
+# plt.semilogx(curve[:, 0], curve[:, 1], color="blue", label="3L")
+plt.semilogx(impingement_testdata["3L_X"], impingement_testdata["3L_Y"], color="black", label="3L", alpha=0.3)
+plt.semilogx(impingement_testdata["GCG20_X"], impingement_testdata["GCG20_Y"], color="green", label="GCG20", alpha=0.3)
+plt.semilogx(impingement_testdata["GAG20_X"], impingement_testdata["GAG20_Y"], color="red", label="GAG20", alpha=0.3)
+plt.semilogx(impingement_testdata["GS_X"], impingement_testdata["GS_Y"], color="magenta", label="GS")
+
+plt.axhline(rotor_speed)
+# plt.axvline(r_acc_limit)
+plt.axvline(impingement_raw["r_impg_acc_sum"].to_numpy()[-1])
+plt.legend()
+
+
+plt.xlabel("Racc")
+plt.ylabel("rot speed")
+plt.show()
+
+
+# now calculate power loss timevector
+power_loss = 0.02  # assuming 2% loss at r_acc_limit
+# lossvector = pl.from_pandas(impingement_raw['r_impg_acc_sum'])
+lossvector = (1 - impingement_raw["r_impg_acc_sum"] / r_acc_limit * power_loss) * 100
+
+# specially for martin, have fun with it
+lossvector_polar = pl.from_pandas(lossvector)
+
+
+# another plot of turbine efficiency
+plt.figure(figsize=(10, 6))
+plt.scatter(impingement_raw["timestamp"], lossvector)
+plt.ylabel("turbine efficiency [%]")
 plt.show()
