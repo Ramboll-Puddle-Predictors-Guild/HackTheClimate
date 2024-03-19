@@ -10,10 +10,15 @@ from scipy.interpolate import interp1d
 from src.turbines import TURBINES
 
 _DATA_DIR = Path(__file__).parents[1] / "Climate_Data"
-WINDFARM_FILES = {"e2": _DATA_DIR / "latvia_edata.csv", "nordsen iii vest": _DATA_DIR / "denmark_edata.csv"}
+WINDFARM_FILES = {
+    "e2": _DATA_DIR / "latvia_edata.csv",
+    "nordsen iii vest": _DATA_DIR / "denmark_edata.csv",
+}
 
 
-def calculate_impingement(turbine: dict, windfarm: Literal["e2", "nordsen iii vest"], slider):
+def calculate_impingement(
+    turbine: dict, windfarm: Literal["e2", "nordsen iii vest"], slider
+):
 
     if windfarm in WINDFARM_FILES:
         # Read the corresponding CSV file
@@ -30,7 +35,9 @@ def calculate_impingement(turbine: dict, windfarm: Literal["e2", "nordsen iii ve
 
     # Interpolate n.star
     impingement_raw["n_star"] = interp1d(
-        turbine["power_curve"]["wind_speed"], turbine["power_curve"]["rotor_speed"], fill_value="extrapolate"
+        turbine["power_curve"]["wind_speed"],
+        turbine["power_curve"]["rotor_speed"],
+        fill_value="extrapolate",
     )(impingement_raw["wsp_150.0"])
 
     # Calculate omega
@@ -47,17 +54,25 @@ def calculate_impingement(turbine: dict, windfarm: Literal["e2", "nordsen iii ve
 
     # Calculate v.max
     impingement_raw["v_max"] = np.sqrt(
-        impingement_raw["wsp_150.0"] ** 2 + (impingement_raw["omega_capped"] * radius) ** 2
+        impingement_raw["wsp_150.0"] ** 2
+        + (impingement_raw["omega_capped"] * radius) ** 2
     )
 
     # Calculate r.impg
-    impingement_raw["r_impg"] = impingement_raw["qrain_150.0"] * impingement_raw["v_max"] * 3600 * (1.225 / 1000)
+    impingement_raw["r_impg"] = (
+        impingement_raw["qrain_150.0"]
+        * impingement_raw["v_max"]
+        * 3600
+        * (1.225 / 1000)
+    )
 
     # Accumulate r.impg
     impingement_raw["r_impg_acc_sum"] = impingement_raw["r_impg"].cumsum()
 
     # Load impingement test data and sort
-    impingement_testdata = pd.read_csv("data/erosion/wpd_datasets_clean.csv", sep=",", decimal=".", header=0)
+    impingement_testdata = pd.read_csv(
+        "data/erosion/wpd_datasets_clean.csv", sep=",", decimal=".", header=0
+    )
     p = pl.read_csv("data/erosion/wpd_datasets_clean.csv").sort("3L_X")
 
     coating = "GS"
@@ -70,6 +85,8 @@ def calculate_impingement(turbine: dict, windfarm: Literal["e2", "nordsen iii ve
 
     # Calculate turbine efficiency loss over time
     power_loss = 0.02  # Assuming slider value is used here
-    lossvector = (1 - impingement_raw["r_impg_acc_sum"] / r_acc_limit * power_loss) * 100
+    lossvector = (
+        1 - impingement_raw["r_impg_acc_sum"] / r_acc_limit * power_loss
+    ) * 100
 
     return impingement_raw, impingement_testdata, r_acc_limit, lossvector

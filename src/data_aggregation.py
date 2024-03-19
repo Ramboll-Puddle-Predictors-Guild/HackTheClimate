@@ -6,7 +6,9 @@ from .power_curve import get_power_at_wind_velocity
 
 
 def join_data(
-    weather_data: pl.LazyFrame, price_data: pl.LazyFrame, power_curve: dict[str, Sequence[float]]
+    weather_data: pl.LazyFrame,
+    price_data: pl.LazyFrame,
+    power_curve: dict[str, Sequence[float]],
 ) -> pl.LazyFrame:
     """Join price and weather data on time.
 

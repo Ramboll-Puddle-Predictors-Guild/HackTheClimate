@@ -37,10 +37,14 @@ def generate_map(windfarm):
         for geom in gdf.geometry:
             if geom.geom_type == "MultiPolygon":
                 for polygon in geom.geoms:
-                    exterior_coords = [[point[1], point[0]] for point in polygon.exterior.coords]
+                    exterior_coords = [
+                        [point[1], point[0]] for point in polygon.exterior.coords
+                    ]
                     coords.append(exterior_coords)
             elif geom.geom_type == "Polygon":
-                exterior_coords = [[point[1], point[0]] for point in geom.exterior.coords]
+                exterior_coords = [
+                    [point[1], point[0]] for point in geom.exterior.coords
+                ]
                 coords.append(exterior_coords)
         return coords
 
