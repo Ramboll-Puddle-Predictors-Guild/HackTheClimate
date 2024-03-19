@@ -1,15 +1,48 @@
-import geopandas as gpd
+from pathlib import Path
 
+import folium
+import geopandas as gpd
+import numpy as np
+
+LOCATION_DATA = Path(__file__).parent.parent / "location"
 
 
 def generate_map(windfarm):
     # Load the GeoJSON files
-    gdf_denmark = gpd.read_file("location\denmark.json")  # Denmark data
-    gdf_latvia = gpd.read_file("location\latvia.json")  # Latvia data
-    
+    gdf_denmark = gpd.read_file(LOCATION_DATA / "denmark.json")  # Denmark data
+    gdf_latvia = gpd.read_file(LOCATION_DATA / "latvia.json")  # Latvia data
+
     # Filter the GeoDataFrames
-    nordsren_iii_vest = gdf_denmark[gdf_denmark["name"] == "Nordsren III vest"]
-    latvia_wind_farm = gdf_latvia  
+    nordsren_iii_vest = gdf_denmark[gdf_denmark["name"] == "Nordsen III vest"]
+    latvia_wind_farm = gdf_latvia
+
+    # Function to calculate the average coordinates from a GeoDataFrame
+    def calculate_average_coords(gdf: gpd.GeoDataFrame):
+        lats, lons = [], []
+        for geom in gdf.geometry:
+            if geom.geom_type == "MultiPolygon":
+                for polygon in geom.geoms:
+                    xs, ys = polygon.exterior.xy
+                    lats.extend(ys)
+                    lons.extend(xs)
+            elif geom.geom_type == "Polygon":
+                xs, ys = geom.exterior.xy
+                lats.extend(ys)
+                lons.extend(xs)
+        return np.mean(lats), np.mean(lons)
+
+    # Function to extract coordinates for plotting
+    def extract_coords(gdf):
+        coords = []
+        for geom in gdf.geometry:
+            if geom.geom_type == "MultiPolygon":
+                for polygon in geom.geoms:
+                    exterior_coords = [[point[1], point[0]] for point in polygon.exterior.coords]
+                    coords.append(exterior_coords)
+            elif geom.geom_type == "Polygon":
+                exterior_coords = [[point[1], point[0]] for point in geom.exterior.coords]
+                coords.append(exterior_coords)
+        return coords
 
     # Calculate average coordinates for Denmark and Latvia individually
     lat_denmark, lon_denmark = calculate_average_coords(nordsren_iii_vest)
