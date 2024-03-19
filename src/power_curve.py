@@ -24,15 +24,13 @@ CUT_OUT_WIND_SPEED = 31.0
 
 
 def read_power_curve(path: str) -> dict[str, Sequence[float]]:
-    curve = {
-        "wind_speed": [],
-        "power": [],
-    }
+    curve = {"wind_speed": [], "power": [], "rotor_speed": []}
     with open(path) as buffer:
         reader = csv.DictReader(buffer, lineterminator="\n")
         for record in reader:
             curve["wind_speed"].append(float(record["wind_speed"]))
             curve["power"].append(float(record["power"]) * 1e-3)
+            curve["rotor_speed"].append(float(record["rotor_speed"]))
     return curve
 
 
