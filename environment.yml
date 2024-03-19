@@ -10,3 +10,6 @@ dependencies:
 - black
 - black-jupyter
 - requestst
+- ipywidgets
+- bokeh
+
