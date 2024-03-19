@@ -1,5 +1,4 @@
-﻿windspeed, power,rotorspeed
-[m/s],[kW],[rpm]
+﻿wind_speed,power,rotor_speed
 0.134483679,-2.672107893,0
 0.453050561,-2.672107893,0
 0.771617443,-2.672107893,0
