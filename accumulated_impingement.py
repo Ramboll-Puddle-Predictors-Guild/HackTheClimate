@@ -53,14 +53,16 @@ impingement_raw["r_impg_acc_sum"] = impingement_raw["r_impg"].cumsum()
 
 # Plotting
 plt.figure(figsize=(10, 6))
-plt.scatter(impingement_raw['timestamp'], impingement_raw['r_impg_acc_sum'])
-plt.xlabel('Timestamp')
+plt.scatter(impingement_raw["timestamp"], impingement_raw["r_impg_acc_sum"])
+plt.xlabel("Timestamp")
 plt.ylabel("accumulated impingement [m]")
 plt.show()
 
 # lookup accumulated impingement at which the coating fails (from wpd dataset)
 
-impingement_testdata = pd.read_csv("data/wpd_datasets_clean.csv", sep=",", decimal=".", header=0)
+impingement_testdata = pd.read_csv(
+    "data/wpd_datasets_clean.csv", sep=",", decimal=".", header=0
+)
 p = pl.read_csv("data/wpd_datasets_clean.csv").sort(by="3L_X")
 
 coating = "GS"
@@ -82,10 +84,33 @@ print(r_acc_limit)
 
 plt.figure(figsize=(10, 6))
 # plt.semilogx(curve[:, 0], curve[:, 1], color="blue", label="3L")
-plt.semilogx(impingement_testdata["3L_X"], impingement_testdata["3L_Y"], color="black", label="3L", alpha=0.3)
-plt.semilogx(impingement_testdata["GCG20_X"], impingement_testdata["GCG20_Y"], color="green", label="GCG20", alpha=0.3)
-plt.semilogx(impingement_testdata["GAG20_X"], impingement_testdata["GAG20_Y"], color="red", label="GAG20", alpha=0.3)
-plt.semilogx(impingement_testdata["GS_X"], impingement_testdata["GS_Y"], color="magenta", label="GS")
+plt.semilogx(
+    impingement_testdata["3L_X"],
+    impingement_testdata["3L_Y"],
+    color="black",
+    label="3L",
+    alpha=0.3,
+)
+plt.semilogx(
+    impingement_testdata["GCG20_X"],
+    impingement_testdata["GCG20_Y"],
+    color="green",
+    label="GCG20",
+    alpha=0.3,
+)
+plt.semilogx(
+    impingement_testdata["GAG20_X"],
+    impingement_testdata["GAG20_Y"],
+    color="red",
+    label="GAG20",
+    alpha=0.3,
+)
+plt.semilogx(
+    impingement_testdata["GS_X"],
+    impingement_testdata["GS_Y"],
+    color="magenta",
+    label="GS",
+)
 
 plt.axhline(rotor_speed)
 # plt.axvline(r_acc_limit)
