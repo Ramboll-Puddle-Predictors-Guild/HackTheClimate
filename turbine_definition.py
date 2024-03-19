@@ -3,16 +3,16 @@
 
 import pandas as pd
 import polars as pl
+from src.power_curve import read_power_curve
 
-# powercurve = pl.read_csv("data/IEA_15_powercurve.csv").lazy()
-IEA3p4 = pd.read_csv("data/IEA_3p4_powercurve_new.csv", header=1)
-IEA15 = pd.read_csv("data/IEA_15_powercurve.csv", header=1)
+# powercurve = pl.read_csv("data\wind_turbines\IEA_15_powercurve.csv").lazy()
+IEA3p4 = pd.read_csv("data\wind_turbines\IEA_3p4_powercurve.csv", header=1)
+IEA15 = pd.read_csv("data\wind_turbines\IEA_15_powercurve.csv", header=1)
 
 
 TURBINES = {
     "IEA 3.4 130": {
-        "power_curve": {"wind_speed": IEA3p4.to_numpy()[:, 0], "power": IEA3p4.to_numpy()[:, 1]},
-        "rotorspeed_curve": {"wind_speed": IEA3p4.to_numpy()[:, 0], "rotorspeed": IEA3p4.to_numpy()[:, 2]},
+        "power_curve": read_power_curve("data/wind_turbines/IEA_3p4_powercurve.csv"),
         "cut_in_wind_speed": 4.0,
         "cut_out_wind_speed": 25.0,
         "rated_wind_speed": 9.8,
@@ -22,8 +22,7 @@ TURBINES = {
         # additional parameters ...
     },
     "IEA 15 240": {
-        "power_curve": {"wind_speed": IEA15.to_numpy()[:, 0], "power": IEA15.to_numpy()[:, 1]},
-        "rotorspeed_curve": {"wind_speed": IEA15.to_numpy()[:, 0], "rotorspeed": IEA15.to_numpy()[:, 2]},
+        "power_curve": read_power_curve("data/wind_turbines/IEA_15_powercurve.csv"),
         "cut_in_wind_speed": 3.0,
         "cut_out_wind_speed": 25.0,
         "rated_wind_speed": 10.66,
@@ -35,7 +34,7 @@ TURBINES = {
 }
 
 
-print(TURBINES["IEA 3.4 130"]["rotorspeed_curve"])
+# print(TURBINES["IEA 3.4 130"]["rotorspeed_curve"])
 
 # import matplotlib.pyplot as plt
 # import numpy as np
