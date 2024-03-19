@@ -17,12 +17,10 @@ def get_query_result(query_id, api_key, records_per_page, page_number):
         dict: The response JSON containing the query result.
     """
     api_url = f"https://public-test.api.vestas.com/public/vestas-climate-library/v1/queryresult/{query_id}/{records_per_page}/{page_number}"
-    headers = {
-        "Content-Type": "application/json",
-        "api_key": api_key
-    }
+    headers = {"Content-Type": "application/json", "api_key": api_key}
     response = requests.get(api_url, headers=headers)
     return response.json()
+
 
 # Example usage
 api_key = "a94iWCzg6W5Aq1J8COyDJd8xa9WB5Ja5"
