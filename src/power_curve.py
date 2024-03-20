@@ -1,6 +1,6 @@
 import csv
 from typing import Sequence
-
+import numpy as np
 
 def read_power_curve(path: str) -> dict[str, Sequence[float]]:
     """Read a wind speed-power-turbine speed curve from CSV.
@@ -27,5 +27,7 @@ def get_power_at_wind_velocity(
     wind_speed: float, curve: dict[str, Sequence[float]]
 ) -> float:
     """Get the power output at a given wind speed."""
-    # TODO: Something here that returns the power (MW) at the given wind speed.
-    raise NotImplementedError()
+    wind_speeds = [float(speed) for speed in curve['wind_speed']]
+    powers = curve['power']
+
+    return np.interp(wind_speed, wind_speeds, powers)

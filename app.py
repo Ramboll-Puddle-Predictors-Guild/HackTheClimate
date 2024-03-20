@@ -177,11 +177,11 @@ class App:
         self.weather_data = data
         return self.weather_data
 
-    def _join_data(self):
+    def _join_data(self, selected_turbine):
         combined_data = self.weather_data.join(self.price_data, on="time", how="inner")
         combined_data = combined_data.with_columns(
             power=pl.col("wind_speed").map_elements(
-                lambda value: get_power_at_wind_velocity(value) * 1e-6
+                lambda value: get_power_at_wind_velocity(value, TURBINES[selected_turbine]["power_curve"]) * 1e-6
             )
         )
         combined_data = combined_data.with_columns(
@@ -452,9 +452,14 @@ class App:
         st.sidebar.image("./data/logos/ramboll_logo_big.png")
         # selected_location = st.sidebar.selectbox("Select wind turbine location:", options=["Denmark", "Latvia"], index=0)
 
-        price_data = self.read_price_data("data/price_data/Denmark.csv")
+        map_selection = {
+            "e2": "data/price_data/Denmark.csv",
+            "nordsen iii vest": "data/price_data/Denmark.csv"
+        }
+
+        price_data = self.read_price_data(map_selection[selected_location])
         weather_data = self.read_weather_data("data/weather_data.csv")
-        combined_data = self._join_data()
+        combined_data = self._join_data(selected_turbine)
 
         box11, box12 = st.columns(2)
         with box11:
