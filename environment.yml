@@ -12,4 +12,9 @@ dependencies:
 - requests
 - ipywidgets
 - bokeh
+- jupyter
+- bokeh=2.4.3
+- pip
+- pip:
+    - streamlit_folium
 
