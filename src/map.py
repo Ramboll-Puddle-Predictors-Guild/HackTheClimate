@@ -13,7 +13,7 @@ def generate_map(windfarm):
     gdf_latvia = gpd.read_file(LOCATION_DATA / "latvia.json")  # Latvia data
 
     # Filter the GeoDataFrames
-    nordsren_iii_vest = gdf_denmark[gdf_denmark["name"] == "Nordsen III vest"]
+    nordsren_iii_vest = gdf_denmark[gdf_denmark["name"] == "Nordsren III vest"]
     latvia_wind_farm = gdf_latvia
 
     # Function to calculate the average coordinates from a GeoDataFrame
@@ -49,6 +49,7 @@ def generate_map(windfarm):
     lat_latvia, lon_latvia = calculate_average_coords(latvia_wind_farm)
 
     # Create focused maps based on user selection
+    print(windfarm)
     focused_map = folium.Map(
         location=(
             [lat_denmark, lon_denmark]
