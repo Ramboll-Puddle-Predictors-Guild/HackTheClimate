@@ -4,7 +4,7 @@ import pandas as pd
 import polars as pl
 from scipy.interpolate import interp1d
 
-from turbine_definition import TURBINES
+from src.turbines import TURBINES
 
 # turbine = TURBINES["IEA 3.4 130"]
 # windfarm = "e2"
